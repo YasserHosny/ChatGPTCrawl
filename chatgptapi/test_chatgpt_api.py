@@ -23,20 +23,43 @@ class ChatgptApiTest:
 
         model = OpenAI(api_key=os.getenv("api_key"))
         print("client.api_key:" + model.api_key)
-        response = model.chat.completions.create(
-            model="gpt-4-vision-preview",
+        image_response = model.chat.completions.create(
+            model="gpt-4o",
             messages=[
                 {
                     "role": "user",
                     "content": [
                         {
                             "type": "image_url",
-                            "image_url": f"data:image/png;base64,{b64_image}",
+                            "image_url": {
+                                "url": f"data:image/jpeg;base64,{b64_image}"
+                            },
                         },
-                        {"type": "text", "text": user_input},
+                        {"type": "text", "text": "Describe image in detail"},
                     ],
                 }
             ],
         )
-        print({"response": response.choices[0].message.content})
-        return response.choices[0].message.content
+        image_description = image_response.choices[0].message.content
+        print({"image_description": image_description})
+        
+        question_response = model.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": 
+                            """Upon component description between | seperator: 
+                            |
+                            {} 
+                            |
+                            Answer the following question: {}""".format(image_description, user_input)},
+                    ],
+                }
+            ],
+        )
+        answer = question_response.choices[0].message.content
+        print({"answer": answer})
+        
+        return answer
