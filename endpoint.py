@@ -18,7 +18,17 @@ def testChatgptApi():
     bot_response = chatgpt.testChatgptApi(user_input, image_file)
     response = bot_response
     return response
-    
+
+@app.route('/api/identify_componentImage', methods=['POST'])
+def identify_componentImage():
+    user_input = request.form.get('user_input')
+    image_file = request.files.get('image_file')
+    print("user_input:" + user_input)
+    chatgpt = ChatgptApiTest()
+    bot_response = chatgpt.identify_componentImage(user_input, image_file)
+    response = bot_response
+    return response
+ 
 
 if __name__ == '__main__':
-    app.run(debug=True, port = 5001)
+    app.run(debug=True, host='0.0.0.0', port = 5001)
